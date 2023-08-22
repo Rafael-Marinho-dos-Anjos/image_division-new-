@@ -12,6 +12,8 @@ def trace_box(
         path: str,
         padding: tuple[float, str] = (0, 'pixel'),
         box_inflation: [float, tuple] = 0,
+        thrshld_sat: int = 100,
+        thrshld_hue: int = 17,
         show: bool = False,
         save: bool = False
         ) -> tuple[tuple[int], tuple[int]]:
@@ -42,8 +44,8 @@ def trace_box(
     h_ = h
     s = hls_img.copy()
     s[:,:,0], s[:,:,1] = hls_img[:,:,2], hls_img[:,:,2]
-    ret, thrsld_1 = cv2.threshold(s, 130, 255, cv2.THRESH_BINARY_INV)
-    ret, thrsld_2 = cv2.threshold(h, 17, 255, cv2.THRESH_BINARY_INV)
+    ret, thrsld_1 = cv2.threshold(s, thrshld_sat, 255, cv2.THRESH_BINARY_INV)
+    ret, thrsld_2 = cv2.threshold(h, thrshld_hue, 255, cv2.THRESH_BINARY_INV)
 
     thrsld = thrsld_1 + thrsld_2
 
@@ -64,9 +66,16 @@ def trace_box(
         floodfill[i,0] = 255,255,255
         floodfill[dim[0]-1,i] = 255,255,255
         floodfill[i,dim[0]-1] = 255,255,255
-    cv2.floodFill(floodfill, mask, (0,0), (0, 0, 0))
+    cv2.floodFill(floodfill, mask, (0,0), (0, 0, 0), (128, 128, 128), (255, 255, 255))
 
     thrsld = cv2.erode(floodfill, kernel, iterations=1)
+
+    contours, _ = cv2.findContours(cv2.cvtColor(thrsld, cv2.COLOR_BGR2GRAY), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    for cnt in contours:
+        if cv2.contourArea(cnt) > 100:
+            mask = np.zeros((h, w), 'uint8')
+            cv2.drawContours(mask, [cnt], -1, 255, -1) 
+            thrsld = cv2.bitwise_and(thrsld, thrsld, mask=mask)
 
     max = [None, None]
     min = [None, None]
@@ -91,7 +100,7 @@ def trace_box(
             or x >= thrsld.shape[1] - border[1]:
                 continue
 
-            if pxl[0] == 255:
+            if pxl[0] > 200:
 
                 if max[0] is None or max[0] < x:
                     max[0] = x
@@ -110,7 +119,7 @@ def trace_box(
 
     # if isinstance(box_inflation, (tuple, list)):
     pixels_inflation = tuple(map(int, (box_inflation[0] * delta_x / 100,
-                                        box_inflation[1] * delta_y / 100)))
+                                       box_inflation[1] * delta_y / 100)))
     # else:
     #     pixels_inflation = tuple(map(int, (box_inflation * delta_x / 100,
     #                                        box_inflation * delta_y / 100)))
@@ -179,7 +188,7 @@ if __name__ == "__main__":
             os.system("cls")
             percent = 100 * imag / image_count
             label_len = 50
-            process_label = ["#" if percent > (i + 1) * 100 / label_len else "_" for i in range(label_len)]
+            process_label = ["#" if percent >= (i + 1) * 100 / label_len else "_" for i in range(label_len)]
             print("Progresso: {} de {} imagens\n".format(imag, image_count)
                 + "".join(process_label) + f" {percent:.2f}%")
         except Exception as error:
