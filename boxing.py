@@ -12,8 +12,8 @@ def trace_box(
         path: str,
         padding: tuple[float, str] = (0, 'pixel'),
         box_inflation: [float, tuple] = 0,
-        thrshld_sat: int = 100,
-        thrshld_hue: int = 17,
+        threshold_sat: int = 100,
+        threshold_hue: int = 17,
         show: bool = False,
         save: bool = False
         ) -> tuple[tuple[int], tuple[int]]:
@@ -38,14 +38,14 @@ def trace_box(
     dim = (560,560)
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     hls_img = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
-    # hls_img = cv2.convertScaleAbs(hls_img, alpha=2)
+
     h = hls_img.copy()
     h[:,:,1], h[:,:,2] = hls_img[:,:,0], hls_img[:,:,0]
-    h_ = h
     s = hls_img.copy()
     s[:,:,0], s[:,:,1] = hls_img[:,:,2], hls_img[:,:,2]
-    ret, thrsld_1 = cv2.threshold(s, thrshld_sat, 255, cv2.THRESH_BINARY_INV)
-    ret, thrsld_2 = cv2.threshold(h, thrshld_hue, 255, cv2.THRESH_BINARY_INV)
+
+    ret, thrsld_1 = cv2.threshold(s, threshold_sat, 255, cv2.THRESH_BINARY_INV)
+    ret, thrsld_2 = cv2.threshold(h, threshold_hue, 255, cv2.THRESH_BINARY_INV)
 
     thrsld = thrsld_1 + thrsld_2
 
@@ -70,12 +70,14 @@ def trace_box(
 
     thrsld = cv2.erode(floodfill, kernel, iterations=1)
 
+    new = cv2.bitwise_and(thrsld, thrsld, mask=np.zeros((h, w), 'uint8'))
     contours, _ = cv2.findContours(cv2.cvtColor(thrsld, cv2.COLOR_BGR2GRAY), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     for cnt in contours:
         if cv2.contourArea(cnt) > 100:
             mask = np.zeros((h, w), 'uint8')
             cv2.drawContours(mask, [cnt], -1, 255, -1) 
-            thrsld = cv2.bitwise_and(thrsld, thrsld, mask=mask)
+            new += cv2.bitwise_and(thrsld, thrsld, mask=mask)
+    thrsld = new
 
     max = [None, None]
     min = [None, None]
@@ -157,9 +159,9 @@ def trace_box(
         raise ValueError("Nao foi possivel tracar uma box na imagem")
 
     if show:
-        img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img2 = cv2.rectangle(img2, min, max, [255,0,0], 9)
-        plt.imshow(output)
+        # img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img2 = cv2.rectangle(img, min, max, [255,0,0], 9)
+        plt.imshow(img2)
         plt.show()
 
     # return (min, max)
@@ -167,35 +169,42 @@ def trace_box(
     return (output, (min, max))
 
 if __name__ == "__main__":
-    image_count = 3750
-    # from take_images import image_count
-    path_folder = os.getcwd() + "\\examples\\"
-    paths = os.listdir(path_folder)
+    # image_count = 3750
+    # # from take_images import image_count
+    # path_folder = os.getcwd() + "\\examples\\"
+    # paths = os.listdir(path_folder)
 
-    labels = open("labels.txt", "w")
-    start = datetime.now()
-    for imag, path in enumerate(paths):
-        try:
-            output = trace_box(
-                path_folder + path,
-                padding=(0, "percent"),
-                box_inflation=(1, 1),
-                show=False)
-            cv2.imwrite(
-                path_folder + "traced_examples\\" + path,
-                output[0])
-            labels.write(path + " -> " + str(output[1]) + "\n")
-            os.system("cls")
-            percent = 100 * imag / image_count
-            label_len = 50
-            process_label = ["#" if percent >= (i + 1) * 100 / label_len else "_" for i in range(label_len)]
-            print("Progresso: {} de {} imagens\n".format(imag, image_count)
-                + "".join(process_label) + f" {percent:.2f}%")
-        except Exception as error:
-            print("Imagem", path, "ignorada")
-            if path[-4:] == ".jpg":
-                shutil.copy2(path_folder + path, path_folder + "traced_examples\\discart\\" + path)
-    end = datetime.now()
-    time_lapse = end - start
-    print("Procedimento completo em {}s".format(time_lapse.seconds))
-    print(f"Aproximadamente {(time_lapse.seconds / image_count):.4f}s por imagem")
+    # labels = open("labels.txt", "w")
+    # start = datetime.now()
+    # for imag, path in enumerate(paths):
+    #     try:
+    #         output = trace_box(
+    #             path_folder + path,
+    #             padding=(0, "percent"),
+    #             box_inflation=(1, 1),
+    #             show=False)
+    #         cv2.imwrite(
+    #             path_folder + "traced_examples\\" + path,
+    #             output[0])
+    #         labels.write(path + " -> " + str(output[1]) + "\n")
+    #         os.system("cls")
+    #         percent = 100 * imag / image_count
+    #         label_len = 50
+    #         process_label = ["#" if percent >= (i + 1) * 100 / label_len else "_" for i in range(label_len)]
+    #         print("Progresso: {} de {} imagens\n".format(imag, image_count)
+    #             + "".join(process_label) + f" {percent:.2f}%")
+    #     except Exception as error:
+    #         print("Imagem", path, "ignorada")
+    #         if path[-4:] == ".jpg":
+    #             shutil.copy2(path_folder + path, path_folder + "traced_examples\\discart\\" + path)
+    # end = datetime.now()
+    # time_lapse = end - start
+    # print("Procedimento completo em {}s".format(time_lapse.seconds))
+    # print(f"Aproximadamente {(time_lapse.seconds / image_count):.4f}s por imagem")
+
+    trace_box(
+        r"\\storage01\Robotica\Dataset CME\ferramentas montadas\11\fotos\frame_0080.jpg",
+        padding=(0, "percent"),
+        box_inflation=(1, 1),
+        show=True
+    )
