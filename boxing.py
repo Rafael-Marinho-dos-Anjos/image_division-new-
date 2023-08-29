@@ -72,11 +72,21 @@ def trace_box(
 
     new = cv2.bitwise_and(thrsld, thrsld, mask=np.zeros((h, w), 'uint8'))
     contours, _ = cv2.findContours(cv2.cvtColor(thrsld, cv2.COLOR_BGR2GRAY), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    
+    if len(contours) == 0:
+        return 0
+    
+    empty = True
     for cnt in contours:
-        if cv2.contourArea(cnt) > 100:
+        if cv2.contourArea(cnt) > 500:
+            empty = False
             mask = np.zeros((h, w), 'uint8')
             cv2.drawContours(mask, [cnt], -1, 255, -1) 
             new += cv2.bitwise_and(thrsld, thrsld, mask=mask)
+
+    if empty:
+        return 0
+
     thrsld = new
 
     max = [None, None]
@@ -166,7 +176,7 @@ def trace_box(
 
     # return (min, max)
     # return (cv2.cvtColor(img2, cv2.COLOR_BGR2RGB), (min, max))
-    return (output, (min, max))
+    return (output, (min, max), thrsld)
 
 if __name__ == "__main__":
     # image_count = 3750

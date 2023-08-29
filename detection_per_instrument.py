@@ -43,7 +43,7 @@ with open("labels.txt", "w") as labels:
                 folder_path + "\\" + image,
                 padding=(0, "percent"),
                 box_inflation=(3, 3),
-                threshold_sat=165,
+                threshold_sat=150,
                 threshold_hue=17,
                 show=False)
             imwrite(
