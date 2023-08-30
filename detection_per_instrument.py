@@ -43,8 +43,8 @@ with open("labels.txt", "w") as labels:
                 folder_path + "\\" + image,
                 padding=(0, "percent"),
                 box_inflation=(3, 3),
-                threshold_sat=150,
-                threshold_hue=17,
+                threshold_sat=100,
+                threshold_hue=12,
                 show=False)
             imwrite(
                 "validation_images\\" + image,
