@@ -1,7 +1,4 @@
 
-import os
-import shutil
-from datetime import datetime
 import cv2
 import numpy as np
 from skimage import io

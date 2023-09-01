@@ -10,7 +10,7 @@ while not ok:
     instrument = input("Wich folder do you want to read? ")
     os.system("cls")
     destination_folder = os.getcwd() + instrument
-    path = r"\\storage01\Robotica\Dataset CME\ferramentas montadas"
+    path = r"\\storage01\Robotica\Dataset CME\ferramentas desmontadas kit trocater"
     folders = os.listdir(path)
 
     if instrument not in folders:
@@ -54,6 +54,7 @@ with open("labels.txt", "w") as labels:
             percent = 100 * i / image_count
             label_len = 50
             process_label = ["#" if percent >= (i + 1) * 100 / label_len else "_" for i in range(label_len)]
+            print("Ferramenta: {}".format(instrument))
             print("Progresso: {} de {} imagens\n".format(i, image_count)
                 + "".join(process_label) + f" {percent:.2f}%")
             
