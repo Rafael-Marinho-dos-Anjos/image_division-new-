@@ -11,7 +11,7 @@ folders = os.listdir(path)
 
 # for folder in folders:
 
-folder = 2
+folder = 4
 subfolders = os.listdir(r"{}\{}".format(path, folder))
 for subfolder in subfolders:
         folder_path = r"{}\{}\{}\fotos".format(path, folder, subfolder)

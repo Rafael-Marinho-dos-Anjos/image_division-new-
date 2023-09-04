@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from skimage import io
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 
 def trace_box(
@@ -32,6 +33,7 @@ def trace_box(
     show [bool] If is True, shows the image with box traced.
     """
     img = io.imread(path)
+    shape = deepcopy(img.shape)[:2]
     dim = (560,560)
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     hls_img = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
@@ -152,12 +154,12 @@ def trace_box(
     output = cv2.rectangle(output, min, max, [0,0,255], 3)
     
     min = (
-        int(img.shape[1] * min[0] / dim[0]),
-        int(img.shape[0] * min[1] / dim[1])
+        int(shape[1] * min[0] / dim[0]),
+        int(shape[0] * min[1] / dim[1])
     )
     max = (
-        int(img.shape[1] * max[0] / dim[0]),
-        int(img.shape[0] * max[1] / dim[1])
+        int(shape[1] * max[0] / dim[0]),
+        int(shape[0] * max[1] / dim[1])
     )
 
     diag_img = (dim[0]**2 + dim[1]**2)
