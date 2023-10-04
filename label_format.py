@@ -5,6 +5,9 @@ import os
 WIDTH = 3840
 HEIGHT = 2160
 
+LABEL_WIDTH = 560
+LABEL_HEIGHT = 560
+
 folder = input("Você deseja formatar as labels de que pasta de arquivos? ")
 
 while folder not in os.listdir("instruments"):
@@ -29,16 +32,17 @@ for count, label in enumerate(labels_list):
     if len(label) < 3:
         continue
     image_path, _, xmin, ymin, xmax, ymax = label.split()
-    open_images_ds_notation = f"{folder} {xmin[2:-1]} {ymin[:-2]} {xmax[1:-1]} {ymax[:-2]}"
 
-    xmax = int(xmax[1:-1]) * WIDTH / 560
-    xmin = int(xmin[2:-1]) * WIDTH / 560
-    ymax = int(ymax[:-2]) * HEIGHT / 560
-    ymin = int(ymin[:-2]) * HEIGHT / 560
+    xmax = int(xmax[1:-1]) * WIDTH / LABEL_WIDTH
+    xmin = int(xmin[2:-1]) * WIDTH / LABEL_WIDTH
+    ymax = int(ymax[:-2]) * HEIGHT / LABEL_HEIGHT
+    ymin = int(ymin[:-2]) * HEIGHT / LABEL_HEIGHT
 
-    width = int(xmax[1:-1]) - int(xmin[2:-1])
-    height = int(ymax[:-2]) - int(ymin[:-2])
-    yolo_notation = f"{folder} {xmin[2:-1]} {ymin[:-2]} {width} {height}"
+    open_images_ds_notation = f"{folder} {int(xmin)} {int(ymin)} {int(xmax)} {int(ymax)}"
+
+    width = int(xmax - xmin)
+    height = int(ymax - ymin)
+    yolo_notation = f"{folder} {xmin} {ymin} {width} {height}"
     image_path = image_path[:-3] + "txt"
 
     with open(r"instruments\{}\Label\Open Images\{}".format(folder, image_path), "w") as notation:
