@@ -2,8 +2,8 @@
 import os
 
 
-WIDTH = 3840
-HEIGHT = 2160
+WIDTH = 1
+HEIGHT = 1
 
 LABEL_WIDTH = 560
 LABEL_HEIGHT = 560
@@ -33,15 +33,15 @@ for count, label in enumerate(labels_list):
         continue
     image_path, _, xmin, ymin, xmax, ymax = label.split()
 
-    xmax = int(xmax[1:-1]) * WIDTH / LABEL_WIDTH
-    xmin = int(xmin[2:-1]) * WIDTH / LABEL_WIDTH
-    ymax = int(ymax[:-2]) * HEIGHT / LABEL_HEIGHT
-    ymin = int(ymin[:-2]) * HEIGHT / LABEL_HEIGHT
+    xmax = float(xmax[1:-1]) * WIDTH / LABEL_WIDTH
+    xmin = float(xmin[2:-1]) * WIDTH / LABEL_WIDTH
+    ymax = float(ymax[:-2]) * HEIGHT / LABEL_HEIGHT
+    ymin = float(ymin[:-2]) * HEIGHT / LABEL_HEIGHT
 
-    open_images_ds_notation = f"{folder} {int(xmin)} {int(ymin)} {int(xmax)} {int(ymax)}"
+    open_images_ds_notation = f"{folder} {xmin} {ymin} {xmax} {ymax}"
 
-    width = int(xmax - xmin)
-    height = int(ymax - ymin)
+    width = xmax - xmin
+    height = ymax - ymin
     yolo_notation = f"{folder} {xmin} {ymin} {width} {height}"
     image_path = image_path[:-3] + "txt"
 

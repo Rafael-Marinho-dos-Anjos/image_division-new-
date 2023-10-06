@@ -11,8 +11,9 @@ folders = os.listdir(path)
 
 # for folder in folders:
 
-folder = 4
-subfolders = os.listdir(r"{}\{}".format(path, folder))
+folder = 3
+# subfolders = os.listdir(r"{}\{}".format(path, folder))
+subfolders = [2]
 for subfolder in subfolders:
         folder_path = r"{}\{}\{}\fotos".format(path, folder, subfolder)
         images = os.listdir(folder_path)
@@ -41,8 +42,8 @@ for subfolder in subfolders:
                         folder_path + "\\" + image,
                         padding=(0, "percent"),
                         box_inflation=(3, 3),
-                        threshold_sat=120,
-                        threshold_hue=12,
+                        threshold_sat=180,
+                        threshold_hue=21,
                         show=False)
                     imwrite(
                         "validation_images\\" + image,

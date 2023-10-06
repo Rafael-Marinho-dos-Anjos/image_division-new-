@@ -65,19 +65,27 @@ def trace_box(
         floodfill[i,0] = 255,255,255
         floodfill[dim[0]-1,i] = 255,255,255
         floodfill[i,dim[0]-1] = 255,255,255
-    cv2.floodFill(floodfill, mask, (0,0), (0, 0, 0), (128, 128, 128), (255, 255, 255))
+    cv2.floodFill(floodfill, 
+                  mask, 
+                  (0,0), 
+                  (0, 0, 0), 
+                  (128, 128, 128), 
+                  (255, 255, 255))
 
     thrsld = cv2.erode(floodfill, kernel, iterations=1)
 
     new = cv2.bitwise_and(thrsld, thrsld, mask=np.zeros((h, w), 'uint8'))
-    contours, _ = cv2.findContours(cv2.cvtColor(thrsld, cv2.COLOR_BGR2GRAY), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(cv2.cvtColor(thrsld, 
+                                                cv2.COLOR_BGR2GRAY), 
+                                                cv2.RETR_EXTERNAL, 
+                                                cv2.CHAIN_APPROX_NONE)
     
     if len(contours) == 0:
         return 0
     
     empty = True
     for cnt in contours:
-        if cv2.contourArea(cnt) > 500:
+        if cv2.contourArea(cnt) > 300:
             empty = False
             mask = np.zeros((h, w), 'uint8')
             cv2.drawContours(mask, [cnt], -1, 255, -1) 
@@ -153,23 +161,31 @@ def trace_box(
     output = cv2.cvtColor(hls_img, cv2.COLOR_HLS2RGB)
     output = cv2.rectangle(output, min, max, [0,0,255], 3)
     
-    min = (
+    min_ = (
         int(shape[1] * min[0] / dim[0]),
         int(shape[0] * min[1] / dim[1])
     )
-    max = (
+    max_ = (
         int(shape[1] * max[0] / dim[0]),
         int(shape[0] * max[1] / dim[1])
+    )
+    min = (
+        min[0] / dim[0],
+        min[1] / dim[1]
+    )
+    max = (
+        max[0] / dim[0],
+        max[1] / dim[1]
     )
 
     diag_img = (dim[0]**2 + dim[1]**2)
     diag_box = (delta_x)**2 + (delta_y)**2
-    if (diag_box / diag_img)**(1/2) < 0.05:
+    if (diag_box / diag_img)**(1/2) < 0.03:
         raise ValueError("Nao foi possivel tracar uma box na imagem")
 
     if show:
         # img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img2 = cv2.rectangle(img, min, max, [255,0,0], 9)
+        img2 = cv2.rectangle(img, min_, max_, [255,0,0], 9)
         plt.imshow(img2)
         plt.show()
 

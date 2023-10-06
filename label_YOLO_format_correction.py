@@ -2,13 +2,6 @@
 """
 import os
 
-
-WIDTH = 1
-HEIGHT = 1
-
-LABEL_WIDTH = 3840
-LABEL_HEIGHT = 2160
-
 folders = [ 
     # "1", "2", "3", "4", "5",
     # "6", "7", "8", "9", "10",
@@ -22,10 +15,8 @@ folders = [
 
 def convert_label(label_text) -> str:
     label_text = label_text.split(" ")
-    label_text[1] = str((WIDTH * float(label_text[1]) / LABEL_WIDTH))
-    label_text[2] = str((HEIGHT * float(label_text[2]) / LABEL_HEIGHT))
-    label_text[3] = str((WIDTH * float(label_text[3]) / LABEL_WIDTH))
-    label_text[4] = str((HEIGHT * float(label_text[4]) / LABEL_HEIGHT))
+    label_text[1] = str((float(label_text[1]) + float(label_text[3]) / 2))
+    label_text[2] = str((float(label_text[2]) + float(label_text[4]) / 2))
     label_text = " ".join(label_text)
     return label_text
 
@@ -34,7 +25,6 @@ bar_length = 50
 
 for i, folder in enumerate(folders):
     yolo_labels = os.listdir(parent_path + folder + "\\Label\\YOLO")
-    open_images_labels = os.listdir(parent_path + folder + "\\Label\\Open Images")
 
     for j, label in enumerate(yolo_labels):
         with open(parent_path + folder + "\\Label\\YOLO\\" + label, "r") as label_txt:
@@ -52,14 +42,6 @@ for i, folder in enumerate(folders):
         percent *= 100
         print("""folder {} of {}\n{} {}%""".
         format(i+1, len(folders), process_bar, percent))
-
-    for j, label in enumerate(open_images_labels):
-        with open(parent_path + folder + "\\Label\\Open Images\\" + label, "r") as label_txt:
-            text = label_txt.read()
-
-        text = convert_label(text)
-        with open(parent_path + folder + "\\Label\\Open Images\\" + label, "w") as label_txt:
-            label_txt.write(text)
 
         process_bar = ""
         for bar_dot in range(bar_length):
