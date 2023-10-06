@@ -38,16 +38,7 @@ for i, folder in enumerate(folders):
         for bar_dot in range(bar_length):
             process_bar += "#" if (j / (2 * len(yolo_labels))) * bar_length >= bar_dot else "_"
 
-        percent = j / (2 * len(yolo_labels))
-        percent *= 100
-        print("""folder {} of {}\n{} {}%""".
-        format(i+1, len(folders), process_bar, percent))
-
-        process_bar = ""
-        for bar_dot in range(bar_length):
-            process_bar += "#" if (j / (2 * len(yolo_labels)) + 0.5) * bar_length >= bar_dot else "_"
-
-        percent = j / (2 * len(yolo_labels)) + 0.5
+        percent = j / len(yolo_labels)
         percent *= 100
         print("""folder {} of {}\n{} {}%""".
         format(i+1, len(folders), process_bar, percent))
